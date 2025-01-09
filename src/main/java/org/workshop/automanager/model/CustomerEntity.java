@@ -14,6 +14,9 @@ public class CustomerEntity {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "cpf")
+    private String cpf;
+
     @Column(name = "email")
     private String email;
 
@@ -37,6 +40,14 @@ public class CustomerEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 
     public String getEmail() {
