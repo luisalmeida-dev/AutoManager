@@ -1,33 +1,20 @@
-package org.workshop.automanager.model;
+package org.workshop.automanager.dto.response;
 
-import jakarta.persistence.*;
 import org.workshop.automanager.enums.RoleEnum;
 
-@Entity
-@Table(name = "customer_tb")
-public class CustomerEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "customer_tb_seq")
-    @Column(name = "id")
+public class CustomerResponseDTO {
     private int id;
 
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "cpf")
     private String cpf;
 
-    @Column(name = "email")
     private String email;
 
-    @Column(name = "phone")
     private String phone;
 
-    @Column(name = "address")
     private String address;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role")
     private RoleEnum role;
 
     public int getId() {
@@ -86,3 +73,4 @@ public class CustomerEntity {
         this.role = role;
     }
 }
+

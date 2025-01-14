@@ -1,7 +1,7 @@
 package org.workshop.automanager.enums;
 
 public enum RoleEnum {
-    MANAGER("Gestor"), PAINTER("Pintor"), TINSMITH("Funileiro");
+    MANAGER("Gestor"), PAINTER("Pintor"), TINSMITH("Funileiro"), CUSTOMER("Cliente");
 
     private final String role_ptbr;
 
