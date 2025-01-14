@@ -1,42 +1,19 @@
-package org.workshop.automanager.model;
+package org.workshop.automanager.dto.request;
 
-import jakarta.persistence.*;
 import org.workshop.automanager.enums.RoleEnum;
 
-@Entity
-@Table(name = "customer_tb")
-public class CustomerEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "customer_tb_seq")
-    @Column(name = "id")
-    private int id;
-
-    @Column(name = "name")
+public class CustomerRequestDTO {
     private String name;
 
-    @Column(name = "cpf")
     private String cpf;
 
-    @Column(name = "email")
     private String email;
 
-    @Column(name = "phone")
     private String phone;
 
-    @Column(name = "address")
     private String address;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role")
     private RoleEnum role;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

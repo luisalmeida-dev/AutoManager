@@ -14,6 +14,7 @@ CREATE TABLE customer_tb
 (
     id      INT          NOT NULL PRIMARY KEY,
     name    VARCHAR(50)  NOT NULL,
+    cpf     VARCHAR(11)  NOT NULL UNIQUE,
     email   VARCHAR(70)  NOT NULL,
     phone   VARCHAR(11)  NOT NULL,
     address VARCHAR(100) NOT NULL,
