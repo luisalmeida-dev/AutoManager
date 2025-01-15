@@ -23,7 +23,7 @@ public class CustomerController {
     }
 
     @GetMapping("/cpf/{cpf}")
-    public ResponseEntity<CustomerResponseDTO> getCustomerByCpf(@PathVariable String cpf) throws Exception {
+    public ResponseEntity<CustomerResponseDTO> getCustomerByCpf(@PathVariable String cpf) {
         return ResponseEntity.ok().body(customerService.getCustomerByCpf(cpf));
     }
 
