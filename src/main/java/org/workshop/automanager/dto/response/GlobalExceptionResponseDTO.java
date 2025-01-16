@@ -30,4 +30,14 @@ public class GlobalExceptionResponseDTO {
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
+
+    public GlobalExceptionResponseDTO() {
+    }
+
+    public GlobalExceptionResponseDTO(int code, String message, LocalDateTime timestamp) {
+        this.code = code;
+        this.message = message;
+        this.timestamp = timestamp;
+    }
+
 }
