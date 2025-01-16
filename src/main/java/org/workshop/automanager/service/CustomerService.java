@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.workshop.automanager.dto.request.CustomerRequestDTO;
 import org.workshop.automanager.dto.response.CustomerResponseDTO;
 import org.workshop.automanager.enums.RoleEnum;
+import org.workshop.automanager.exception.NotFoundException;
 import org.workshop.automanager.mapper.CustomerMapper;
 import org.workshop.automanager.model.CustomerEntity;
 import org.workshop.automanager.repository.CustomerRepository;
@@ -27,10 +28,10 @@ public class CustomerService {
         customerRepository.save(customerMapper.toCustomerEntity(requestDTO));
     }
 
-    public CustomerResponseDTO getCustomerByCpf(String cpf) throws Exception {
+    public CustomerResponseDTO getCustomerByCpf(String cpf){
         CustomerEntity entity = customerRepository.findByCpf(cpf);
         if (entity == null) {
-            throw new Exception("Customer not found!");
+            throw new NotFoundException("Cliente não encontrado!");
         }
         return customerMapper.toCustomerResponseDTO(entity);
     }
