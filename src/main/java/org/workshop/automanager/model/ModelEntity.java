@@ -13,9 +13,8 @@ public class ModelEntity {
     @Column(name = "name")
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
-    private BrandEntity brand;
+    private Integer brandId;
 
     public int getId() {
         return id;
@@ -29,11 +28,11 @@ public class ModelEntity {
         this.name = name;
     }
 
-    public BrandEntity getBrand() {
-        return brand;
+    public Integer getBrandId() {
+        return brandId;
     }
 
-    public void setBrand(BrandEntity brand) {
-        this.brand = brand;
+    public void setBrandId(Integer brandId) {
+        this.brandId = brandId;
     }
 }
