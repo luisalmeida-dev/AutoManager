@@ -23,4 +23,9 @@ public class ModelRequestDTO {
     public void setBrandId(Integer brandId) {
         this.brandId = brandId;
     }
+
+    public ModelRequestDTO(String name, Integer brandId) {
+        this.name = name;
+        this.brandId = brandId;
+    }
 }
