@@ -60,6 +60,6 @@ public class BrandService {
     public String getBrandNameById(Integer brandId) {
         return brandRepository.findById(brandId)
                 .map(BrandEntity::getName)
-                .orElseThrow(() -> new RuntimeException("Brand not found"));
+                .orElseThrow(() -> new RuntimeException("Não há marca com o ID fornecido"));
     }
 }
