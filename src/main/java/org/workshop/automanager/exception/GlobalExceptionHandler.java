@@ -29,10 +29,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(response.getCode()).body(response);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<GlobalExceptionResponseDTO> handle(MethodArgumentNotValidException exception) {
+    @ExceptionHandler(InvalidArgumentException.class)
+    public ResponseEntity<GlobalExceptionResponseDTO> handle(InvalidArgumentException exception) {
         GlobalExceptionResponseDTO response = new GlobalExceptionResponseDTO(
-                HttpStatus.BAD_REQUEST.value(), exception.getFieldError().getDefaultMessage(), LocalDateTime.now()
+                HttpStatus.BAD_REQUEST.value(), exception.getMessage(), LocalDateTime.now()
         );
         return ResponseEntity.status(response.getCode()).body(response);
     }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.workshop.automanager.dto.request.ModelRequestDTO;
 import org.workshop.automanager.dto.response.ModelResponseDTO;
 import org.workshop.automanager.exception.AlreadyExistsException;
+import org.workshop.automanager.exception.InvalidArgumentException;
 import org.workshop.automanager.exception.NotFoundException;
 import org.workshop.automanager.mapper.ModelMapper;
 import org.workshop.automanager.model.ModelEntity;
@@ -26,8 +27,8 @@ public class ModelService {
     private BrandService brandService;
 
 
-    public void create (ModelRequestDTO request) {
-        if(modelRepository.existsByNameAndBrandId(request.getName(), request.getBrandId())) {
+    public void create(ModelRequestDTO request) {
+        if (modelRepository.existsByNameAndBrandId(request.getName(), request.getBrandId())) {
             throw new AlreadyExistsException("O modelo " + request.getName() + " da marca " + brandService.getBrandNameById(request.getBrandId()) + " já existe.");
         }
         doesBrandExists(request.getBrandId());
@@ -36,30 +37,37 @@ public class ModelService {
     }
 
     public ModelResponseDTO getById(Integer id) {
-        Optional<ModelEntity> entity = modelRepository.findById(id);
-        if(entity.isEmpty()) {
-            throw new NotFoundException("O modelo não foi encontrado.");
+        if (id == null || id <= 0) {
+            throw new InvalidArgumentException("O ID " + id + " recebido é inválido");
         }
-        brandService.getBrand(entity.get().getBrandId());
-        return modelMapper.toModelResponseDTO(entity.get(), brandService);
+        ModelEntity entity = modelRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Modelo com ID " + id + " não encontrado"));
+        return modelMapper.toModelResponseDTO(entity, brandService);
     }
+
 
     public List<ModelResponseDTO> getAll() {
         return modelMapper.toModelResponseDTOList(modelRepository.findAll(), brandService);
     }
 
     public void deleteById(Integer id) {
+        if (id == null || id <= 0) {
+            throw new InvalidArgumentException("O ID " + id + " recebido é inválido");
+        }
         Optional<ModelEntity> entity = modelRepository.findById(id);
-        if(entity.isEmpty()) {
+        if (entity.isEmpty()) {
             throw new NotFoundException("O modelo nao foi encontrado.");
         }
         modelRepository.delete(entity.get());
     }
 
     public void update(@Valid ModelRequestDTO request, Integer id) {
+        if (id == null || id <= 0) {
+            throw new InvalidArgumentException("O ID " + id + " recebido é inválido");
+        }
         doesBrandExists(request.getBrandId());
         Optional<ModelEntity> entity = modelRepository.findById(id);
-        if(entity.isEmpty()) {
+        if (entity.isEmpty()) {
             throw new NotFoundException("O modelo não foi encontrado.");
         }
         entity.get().setName(request.getName());
@@ -68,8 +76,8 @@ public class ModelService {
     }
 
     private void doesBrandExists(Integer id) {
-        if(brandService.getBrand(id) == null) {
+        if (brandService.getBrand(id) == null) {
             throw new NotFoundException("Marca nao encontrada.");
-        };
+        }
     }
 }
