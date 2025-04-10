@@ -22,7 +22,7 @@ public class BrandService {
     private BrandMapper brandMapper;
 
     public void createBrand(BrandRequestDTO request) {
-        if (brandRepository.existsByName(request.getName())) {
+        if (brandRepository.existsByName(request.getName()) ) {
             throw new AlreadyExistsException("Marca já cadastrada.");
         }
         brandRepository.save(brandMapper.toEntity(request));
@@ -55,5 +55,11 @@ public class BrandService {
             throw new NotFoundException("Marca não encontrada.");
         }
         brandRepository.delete(entity.get());
+    }
+
+    public String getBrandNameById(Integer brandId) {
+        return brandRepository.findById(brandId)
+                .map(BrandEntity::getName)
+                .orElseThrow(() -> new RuntimeException("Não há marca com o ID fornecido"));
     }
 }
