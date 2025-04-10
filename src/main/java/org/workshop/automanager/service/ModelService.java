@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.workshop.automanager.dto.request.ModelRequestDTO;
 import org.workshop.automanager.dto.response.ModelResponseDTO;
 import org.workshop.automanager.exception.AlreadyExistsException;
+import org.workshop.automanager.exception.InvalidArgumentException;
 import org.workshop.automanager.exception.NotFoundException;
 import org.workshop.automanager.mapper.ModelMapper;
 import org.workshop.automanager.model.ModelEntity;
@@ -43,6 +44,7 @@ public class ModelService {
                 .orElseThrow(() -> new NotFoundException("Modelo com ID " + id + " não encontrado"));
         return modelMapper.toModelResponseDTO(entity, brandService);
     }
+
 
     public List<ModelResponseDTO> getAll() {
         return modelMapper.toModelResponseDTOList(modelRepository.findAll(), brandService);
