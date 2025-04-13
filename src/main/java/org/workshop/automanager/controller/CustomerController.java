@@ -17,7 +17,7 @@ public class CustomerController {
     private CustomerService customerService;
 
     @PostMapping
-    public ResponseEntity<HttpStatus> createCustomer(@RequestBody CustomerRequestDTO requestDTO) throws Throwable {
+    public ResponseEntity<HttpStatus> createCustomer(@RequestBody CustomerRequestDTO requestDTO) {
         customerService.creteCustomer(requestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -28,7 +28,7 @@ public class CustomerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CustomerResponseDTO> getCustomerById(@PathVariable int id) throws Exception {
+    public ResponseEntity<CustomerResponseDTO> getCustomerById(@PathVariable int id) {
 
         return ResponseEntity.ok().body(customerService.getCustomerById(id));
     }
@@ -39,13 +39,13 @@ public class CustomerController {
     }
 
     @PutMapping
-    public ResponseEntity<HttpStatus> update(@RequestBody CustomerRequestDTO requestDTO) throws Exception {
+    public ResponseEntity<HttpStatus> update(@RequestBody CustomerRequestDTO requestDTO) {
         customerService.updateCustomerByCpf(requestDTO);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{cpf}")
-    public ResponseEntity<HttpStatus> delete(@PathVariable String cpf) throws Exception {
+    public ResponseEntity<HttpStatus> delete(@PathVariable String cpf) {
         customerService.deleteByCpf(cpf);
         return ResponseEntity.noContent().build();
     }

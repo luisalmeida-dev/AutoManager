@@ -62,4 +62,16 @@ public class CustomerRequestDTO {
     public void setRole(RoleEnum role) {
         this.role = role;
     }
+
+    public CustomerRequestDTO(String name, String cpf, String email, String phone, String address, RoleEnum role) {
+        this.name = name;
+        this.cpf = cpf;
+        this.email = email;
+        this.phone = phone;
+        this.address = address;
+        this.role = role;
+    }
+
+    public CustomerRequestDTO() {
+    }
 }
