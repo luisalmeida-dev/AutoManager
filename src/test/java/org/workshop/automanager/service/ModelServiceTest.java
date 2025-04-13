@@ -122,7 +122,6 @@ class ModelServiceTest {
 
     @Test
     void getAllSuccessfully() {
-        List<ModelResponseDTO> result = modelService.getAll();
         List<ModelEntity> entityList = new ArrayList<>();
         entityList.add(mock(ModelEntity.class));
         entityList.add(mock(ModelEntity.class));
@@ -133,6 +132,8 @@ class ModelServiceTest {
 
         when(modelRepository.findAll()).thenReturn(entityList);
         when(modelMapper.toModelResponseDTOList(entityList, brandService)).thenReturn(expectedList);
+
+        List<ModelResponseDTO> result = modelService.getAll();
 
         Assertions.assertEquals(2, result.size());
         Assertions.assertEquals(expectedList, result);
@@ -220,7 +221,7 @@ class ModelServiceTest {
         int id = 999;
         ModelRequestDTO request = new ModelRequestDTO("Chevete", 1);
         BrandresponseDTO expectedResponse = new BrandresponseDTO(request.getBrandId(), "GM");
-        
+
         when(brandService.getBrand(request.getBrandId())).thenReturn(expectedResponse);
         when(modelRepository.findById(id)).thenReturn(Optional.empty());
 
