@@ -16,7 +16,7 @@ public class CarEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
-    private CustomerEntity customerId;
+    private CustomerEntity customer;
 
     @Column(name = "plate")
     private String plate;
@@ -39,12 +39,12 @@ public class CarEntity {
         this.model = model;
     }
 
-    public CustomerEntity getCustomerId() {
-        return customerId;
+    public CustomerEntity getCustomer() {
+        return customer;
     }
 
-    public void setCustomerId(CustomerEntity customerId) {
-        this.customerId = customerId;
+    public void setCustomer(CustomerEntity customer) {
+        this.customer = customer;
     }
 
     public String getPlate() {

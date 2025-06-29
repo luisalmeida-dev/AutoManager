@@ -16,6 +16,7 @@ import org.workshop.automanager.exception.AlreadyExistsException;
 import org.workshop.automanager.exception.InvalidArgumentException;
 import org.workshop.automanager.exception.NotFoundException;
 import org.workshop.automanager.mapper.ModelMapper;
+import org.workshop.automanager.model.BrandEntity;
 import org.workshop.automanager.model.ModelEntity;
 import org.workshop.automanager.repository.ModelRepository;
 
@@ -43,10 +44,13 @@ class ModelServiceTest {
     void createWhenModelAlreadyExistsTest() {
         //Arrange
         ModelRequestDTO request = new ModelRequestDTO("Chevrolet", 1);
+        BrandEntity brandEntity = new BrandEntity();
+        brandEntity.setId(1);
+        brandEntity.setName("Teste");
 
         //Act
-        when(modelRepository.existsByNameAndBrandId(request.getName(), request.getBrandId())).thenReturn(true);
-        when(brandService.getBrandNameById(request.getBrandId())).thenReturn("Teste");
+        when(brandService.getBrandEntityById(request.getBrandId())).thenReturn(brandEntity);
+        when(modelRepository.existsByNameAndBrand(request.getName(), brandEntity)).thenReturn(true);
 
         //Assert
         AlreadyExistsException exception = Assertions.assertThrows(AlreadyExistsException.class, () ->
@@ -60,15 +64,17 @@ class ModelServiceTest {
         //Arrange
         ModelRequestDTO request = new ModelRequestDTO("Chevrolet", 1);
         ModelEntity entity = new ModelEntity();
-        entity.setBrandId(1);
         entity.setName("Chevrolet");
 
-        BrandresponseDTO response = new BrandresponseDTO(1, "Chevrolet");
+        BrandEntity brandEntity = new BrandEntity();
+        brandEntity.setId(1);
+        brandEntity.setName("Chevrolet");
+        entity.setBrand(brandEntity);
 
         //Act
-        when(modelRepository.existsByNameAndBrandId(request.getName(), request.getBrandId())).thenReturn(false);
+        when(brandService.getBrandEntityById(request.getBrandId())).thenReturn(brandEntity);
+        when(modelRepository.existsByNameAndBrand(request.getName(), brandEntity)).thenReturn(false);
         when(modelMapper.toModelEntity(request)).thenReturn(entity);
-        when(brandService.getBrand(request.getBrandId())).thenReturn(response);
         modelService.create(request);
 
         //Assert
@@ -79,19 +85,22 @@ class ModelServiceTest {
     void getByIdSuccessfully() {
         int id = 1;
 
+        BrandEntity brandEntity = new BrandEntity();
+        brandEntity.setName("Fiat");
+
         ModelEntity entity = new ModelEntity();
         entity.setName("Palio");
-        entity.setBrandId(id);
+        entity.setBrand(brandEntity);
 
         ModelResponseDTO expectedResponse = new ModelResponseDTO(id, entity.getName(), "Fiat");
 
         when(modelRepository.findById(id)).thenReturn(Optional.of(entity));
-        when(modelMapper.toModelResponseDTO(entity, brandService)).thenReturn(expectedResponse);
+        when(modelMapper.toModelResponseDTO(entity)).thenReturn(expectedResponse);
         ModelResponseDTO result = modelService.getById(id);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse, result);
-        verify(modelMapper, times(1)).toModelResponseDTO(entity, brandService);
+        verify(modelMapper, times(1)).toModelResponseDTO(entity);
         verify(modelRepository, times(1)).findById(id);
     }
 
@@ -131,26 +140,26 @@ class ModelServiceTest {
         expectedList.add(new ModelResponseDTO(2, "Celta", "Chevrolet"));
 
         when(modelRepository.findAll()).thenReturn(entityList);
-        when(modelMapper.toModelResponseDTOList(entityList, brandService)).thenReturn(expectedList);
+        when(modelMapper.toModelResponseDTOList(entityList)).thenReturn(expectedList);
 
         List<ModelResponseDTO> result = modelService.getAll();
 
         Assertions.assertEquals(2, result.size());
         Assertions.assertEquals(expectedList, result);
         verify(modelRepository, times(1)).findAll();
-        verify(modelMapper, times(1)).toModelResponseDTOList(entityList, brandService);
+        verify(modelMapper, times(1)).toModelResponseDTOList(entityList);
     }
 
     @Test
     void getAllEmptyList() {
         when(modelRepository.findAll()).thenReturn(List.of());
-        when(modelMapper.toModelResponseDTOList(List.of(), brandService)).thenReturn(List.of());
+        when(modelMapper.toModelResponseDTOList(List.of())).thenReturn(List.of());
 
         List<ModelResponseDTO> result = modelService.getAll();
 
         Assertions.assertTrue(result.isEmpty());
         verify(modelRepository, atLeastOnce()).findAll();
-        verify(modelMapper, atLeastOnce()).toModelResponseDTOList(List.of(), brandService);
+        verify(modelMapper, atLeastOnce()).toModelResponseDTOList(List.of());
     }
 
     @Test
@@ -159,7 +168,6 @@ class ModelServiceTest {
 
         ModelEntity entity = new ModelEntity();
         entity.setName("Chevette");
-        entity.setBrandId(2);
 
         when(modelRepository.findById(id)).thenReturn(Optional.of(entity));
         modelService.deleteById(id);
@@ -193,13 +201,14 @@ class ModelServiceTest {
         int id = 999;
         ModelRequestDTO request = new ModelRequestDTO("Chevette", 1);
         ModelEntity entity = new ModelEntity();
-        entity.setBrandId(request.getBrandId());
         entity.setName("Chevy 500");
 
-        BrandresponseDTO expectedResponse = new BrandresponseDTO(request.getBrandId(), "GM");
+        BrandEntity brandEntity = new BrandEntity();
+        brandEntity.setId(1);
+        brandEntity.setName("GM");
 
-        when(brandService.getBrand(request.getBrandId())).thenReturn(expectedResponse);
         when(modelRepository.findById(id)).thenReturn(Optional.of(entity));
+        when(brandService.getBrandEntityById(request.getBrandId())).thenReturn(brandEntity);
         modelService.update(request, id);
 
         verify(modelRepository, times(1)).save(entity);
@@ -220,14 +229,29 @@ class ModelServiceTest {
     void updateNotFound() {
         int id = 999;
         ModelRequestDTO request = new ModelRequestDTO("Chevete", 1);
-        BrandresponseDTO expectedResponse = new BrandresponseDTO(request.getBrandId(), "GM");
 
-        when(brandService.getBrand(request.getBrandId())).thenReturn(expectedResponse);
         when(modelRepository.findById(id)).thenReturn(Optional.empty());
 
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> modelService.update(request, id));
 
         Assertions.assertEquals("O modelo não foi encontrado.", exception.getMessage());
+        verify(brandService, never()).getBrandEntityById(any());
+        verify(modelRepository, never()).save(any(ModelEntity.class));
+    }
+
+    @Test
+    void updateBrandNotFound() {
+        int modelId = 1;
+        int brandId = 2;
+        ModelRequestDTO request = new ModelRequestDTO("Novo Nome", brandId);
+        ModelEntity modelEntity = new ModelEntity(); // Simula o modelo existente
+
+        when(modelRepository.findById(modelId)).thenReturn(Optional.of(modelEntity));
+        when(brandService.getBrandEntityById(brandId)).thenThrow(new NotFoundException("Marca com ID " + brandId + " não encontrada"));
+
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> modelService.update(request, modelId));
+
+        Assertions.assertEquals("Marca com ID " + brandId + " não encontrada", exception.getMessage());
         verify(modelRepository, never()).save(any(ModelEntity.class));
     }
 }

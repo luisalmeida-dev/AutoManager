@@ -13,17 +13,16 @@ public interface ModelMapper {
     // Método para mapear ModelRequestDTO para ModelEntity
     ModelEntity toModelEntity(ModelRequestDTO modelRequestDTO);
 
-    // Método default para mapear ModelEntity para ModelResponseDTO, buscando brandName automaticamente
-    default ModelResponseDTO toModelResponseDTO(ModelEntity modelEntity, BrandService brandService) {
-        String brandName = brandService.getBrandNameById(modelEntity.getBrandId());
-        return new ModelResponseDTO(modelEntity.getId(), modelEntity.getName(), brandName);
+    // Método default para mapear ModelEntity para ModelResponseDTO
+    default ModelResponseDTO toModelResponseDTO(ModelEntity modelEntity) {
+        return new ModelResponseDTO(modelEntity.getId(), modelEntity.getName(), modelEntity.getBrand().getName());
     }
 
 
     // Método default para mapear uma lista de ModelEntity para uma lista de ModelResponseDTO
-    default List<ModelResponseDTO> toModelResponseDTOList(List<ModelEntity> modelEntities, BrandService brandService) {
+    default List<ModelResponseDTO> toModelResponseDTOList(List<ModelEntity> modelEntities) {
         return modelEntities.stream()
-                .map(modelEntity -> toModelResponseDTO(modelEntity, brandService))
+                .map(this::toModelResponseDTO)
                 .toList();
     }
 }
