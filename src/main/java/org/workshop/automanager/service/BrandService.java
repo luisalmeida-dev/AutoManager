@@ -75,4 +75,12 @@ public class BrandService {
                 .map(BrandEntity::getName)
                 .orElseThrow(() -> new NotFoundException("Não há marca com o ID " + brandId + " fornecido"));
     }
+
+    public BrandEntity getBrandEntityById(Integer id) {
+        if (id == null || id <= 0) {
+            throw new InvalidArgumentException("O ID " + id + " recebido é inválido");
+        }
+        return brandRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Marca com ID " + id + " não encontrada"));
+    }
 }

@@ -3,6 +3,7 @@ package org.workshop.automanager.model;
 import jakarta.persistence.*;
 import org.workshop.automanager.enums.StatusEnum;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -38,10 +39,10 @@ public class TaskEntity {
     private Date endDate;
 
     @Column(name = "estimate")
-    private double estimate;
+    private BigDecimal estimate;
 
     @Column(name = "final_value")
-    private double finalValue;
+    private BigDecimal finalValue;
 
     public int getId() {
         return id;
@@ -103,19 +104,19 @@ public class TaskEntity {
         this.endDate = endDate;
     }
 
-    public double getEstimate() {
+    public BigDecimal getEstimate() {
         return estimate;
     }
 
-    public void setEstimate(double estimate) {
+    public void setEstimate(BigDecimal estimate) {
         this.estimate = estimate;
     }
 
-    public double getFinalValue() {
+    public BigDecimal getFinalValue() {
         return finalValue;
     }
 
-    public void setFinalValue(double finalValue) {
+    public void setFinalValue(BigDecimal finalValue) {
         this.finalValue = finalValue;
     }
 }
