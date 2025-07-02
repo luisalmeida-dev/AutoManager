@@ -57,23 +57,28 @@ public class ModelService {
         if (id == null || id <= 0) {
             throw new InvalidArgumentException("O ID " + id + " recebido é inválido");
         }
-        Optional<ModelEntity> entity = modelRepository.findById(id);
-        if (entity.isEmpty()) {
-            throw new NotFoundException("O modelo nao foi encontrado.");
+        if (!modelRepository.existsById(id)) {
+            throw new NotFoundException("Modelo com ID " + id + " não encontrado.");
         }
-        modelRepository.delete(entity.get());
+        modelRepository.deleteById(id);
     }
 
     public void update(@Valid ModelRequestDTO request, Integer id) {
         if (id == null || id <= 0) {
             throw new InvalidArgumentException("O ID " + id + " recebido é inválido");
         }
-        Optional<ModelEntity> entity = modelRepository.findById(id);
-        if (entity.isEmpty()) {
-            throw new NotFoundException("O modelo não foi encontrado.");
+
+        ModelEntity modelEntity = modelRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Modelo com ID " + id + " não encontrado."));
+
+        BrandEntity brandEntity = brandService.getBrandEntityById(request.getBrandId());
+
+        if (modelRepository.existsByNameAndBrand(request.getName(), brandEntity) && !modelEntity.getName().equals(request.getName())) {
+            throw new AlreadyExistsException("O modelo " + request.getName() + " da marca " + brandEntity.getName() + " já existe.");
         }
-        entity.get().setName(request.getName());
-        entity.get().setBrand(brandService.getBrandEntityById(request.getBrandId()));
-        modelRepository.save(entity.get());
+
+        modelEntity.setName(request.getName());
+        modelEntity.setBrand(brandEntity);
+        modelRepository.save(modelEntity);
     }
 }

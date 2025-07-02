@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.workshop.automanager.dto.request.ModelRequestDTO;
-import org.workshop.automanager.dto.response.BrandresponseDTO;
 import org.workshop.automanager.dto.response.ModelResponseDTO;
 import org.workshop.automanager.exception.AlreadyExistsException;
 import org.workshop.automanager.exception.InvalidArgumentException;
@@ -166,13 +165,10 @@ class ModelServiceTest {
     void deleteByIdSuccessfully() {
         int id = 1;
 
-        ModelEntity entity = new ModelEntity();
-        entity.setName("Chevette");
-
-        when(modelRepository.findById(id)).thenReturn(Optional.of(entity));
+        when(modelRepository.existsById(id)).thenReturn(true);
         modelService.deleteById(id);
 
-        verify(modelRepository, times(1)).delete(entity);
+        verify(modelRepository, times(1)).deleteById(id);
     }
 
     @ParameterizedTest
@@ -188,12 +184,12 @@ class ModelServiceTest {
     @Test
     void deleteByIdNotFound() {
         int id = 999;
-        when(modelRepository.findById(id)).thenReturn(Optional.empty());
+        when(modelRepository.existsById(id)).thenReturn(false);
 
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> modelService.deleteById(id));
 
-        Assertions.assertEquals("O modelo nao foi encontrado.", exception.getMessage());
-        verify(modelRepository, never()).delete(any(ModelEntity.class));
+        Assertions.assertEquals("Modelo com ID " + id + " não encontrado.", exception.getMessage());
+        verify(modelRepository, never()).deleteById(any(Integer.class));
     }
 
     @Test
@@ -228,13 +224,13 @@ class ModelServiceTest {
     @Test
     void updateNotFound() {
         int id = 999;
-        ModelRequestDTO request = new ModelRequestDTO("Chevete", 1);
+        ModelRequestDTO request = new ModelRequestDTO("Chevette", 1);
 
         when(modelRepository.findById(id)).thenReturn(Optional.empty());
 
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> modelService.update(request, id));
 
-        Assertions.assertEquals("O modelo não foi encontrado.", exception.getMessage());
+        Assertions.assertEquals("Modelo com ID " + id + " não encontrado.", exception.getMessage());
         verify(brandService, never()).getBrandEntityById(any());
         verify(modelRepository, never()).save(any(ModelEntity.class));
     }
