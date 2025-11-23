@@ -83,4 +83,11 @@ public class CustomerService {
         }
         customerRepository.delete(entity);
     }
+
+    public CustomerEntity getCustomerEntityById(Integer id) {
+        if (id == null || id <= 0) {
+            throw new InvalidArgumentException("O ID " + id + " recebido é inválido");
+        }
+        return customerRepository.findById(id).orElseThrow(() -> new NotFoundException("Cliente com ID " + id + " não encontrado"));
+    }
 }

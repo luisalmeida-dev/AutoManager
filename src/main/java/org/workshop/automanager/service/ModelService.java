@@ -14,7 +14,6 @@ import org.workshop.automanager.model.ModelEntity;
 import org.workshop.automanager.repository.ModelRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ModelService {
@@ -80,5 +79,13 @@ public class ModelService {
         modelEntity.setName(request.getName());
         modelEntity.setBrand(brandEntity);
         modelRepository.save(modelEntity);
+    }
+
+    //Não expor esse metodo em um endpoint
+    public ModelEntity getModelEntityById(Integer id) {
+        if (id == null || id <= 0) {
+            throw new InvalidArgumentException("O ID " + id + " recebido é inválido");
+        }
+        return modelRepository.findById(id).orElseThrow(() -> new NotFoundException("Modelo com ID " + id + " não encontrado"));
     }
 }
