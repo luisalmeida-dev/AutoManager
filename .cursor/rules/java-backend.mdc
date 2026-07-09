@@ -1,0 +1,109 @@
+---
+description: Padrões Java/Spring Boot — SOLID, Clean Code, camadas e convenções AutoManager
+globs: "**/*.java"
+alwaysApply: false
+---
+
+# Java Backend — AutoManager
+
+## Camadas (não violar)
+
+```
+Controller → Service → Repository → Entity
+```
+
+- **Controller**: HTTP only. Sem `if` de negócio. Use `@Valid` em requests.
+- **Service**: Regras de negócio, orquestração entre repositories/services.
+- **Repository**: Queries JPA. Sem validação de negócio.
+- **Entity**: Persistência. Nunca retornar direto na API.
+
+## SOLID na prática
+
+```java
+// ✅ SRP — Service com uma responsabilidade
+@Service
+public class BrandService {
+    public BrandResponseDTO getBrand(Integer id) { ... }
+}
+
+// ❌ Controller fazendo validação de negócio
+@PostMapping
+public ResponseEntity<?> create(@RequestBody BrandRequestDTO req) {
+    if (brandRepository.existsByName(req.getName())) { ... } // ERRADO
+}
+```
+
+```java
+// ✅ DIP — Depender de interface (Repository injetado)
+public BrandService(BrandRepository brandRepository, BrandMapper brandMapper) {
+    this.brandRepository = brandRepository;
+    this.brandMapper = brandMapper;
+}
+
+// ❌ Field injection (legado — migrar gradualmente)
+@Autowired
+private BrandRepository brandRepository;
+```
+
+## Clean Code
+
+- Métodos < 20 linhas; extraia validações repetidas
+- Early return para reduzir aninhamento
+- `Optional`: use `.orElseThrow()`, nunca `get()` sem verificação
+- Sem código morto após `orElseThrow` (unreachable checks)
+- Nomes: verbos para métodos (`createBrand`), substantivos para classes (`BrandService`)
+
+## DTO e validação
+
+```java
+// ✅ Validação na borda (Request DTO)
+public class BrandRequestDTO {
+    @NotBlank(message = "O campo nome não pode ser vazio.")
+    private String name;
+}
+
+// ✅ Controller
+@PostMapping
+public ResponseEntity<HttpStatus> create(@Valid @RequestBody BrandRequestDTO request) { ... }
+
+// ❌ Entity exposta na API
+@GetMapping("/{id}")
+public BrandEntity get(@PathVariable int id) { ... }
+```
+
+## Exceções de domínio
+
+| Situação | Exceção | HTTP |
+|----------|---------|------|
+| ID inválido (null, <= 0) | `InvalidArgumentException` | 400 |
+| Recurso não encontrado | `NotFoundException` | 404 |
+| Duplicidade | `AlreadyExistsException` | 409 |
+
+Lance exceções no **Service**. Nunca retorne `null` para "não encontrado".
+
+## MapStruct
+
+- Toda conversão Entity ↔ DTO via `@Mapper(componentModel = "spring")`
+- Mappers são interfaces; MapStruct gera implementação
+- Relacionamentos complexos: métodos `@Mapping` explícitos
+
+## JPA
+
+- `@ManyToOne(fetch = FetchType.LAZY)` para relacionamentos
+- Evite N+1: use `@EntityGraph` ou fetch join quando listar com relações
+- IDs: `Integer` ou `int` conforme padrão da entidade existente
+
+## Segurança (meta — ainda não implementado)
+
+- Senhas: BCrypt via `PasswordEncoder`
+- Endpoints protegidos com Spring Security
+- Nunca logar ou retornar senha em Response DTO
+
+## Ao refatorar código legado
+
+Priorize nesta ordem:
+1. Adicionar `@Valid` onde falta
+2. Remover dead code e typos em APIs públicas
+3. Constructor injection
+4. Extrair validação de ID duplicada
+5. Renomear DTOs/classes com typo (manter compatibilidade ou migrar de uma vez)

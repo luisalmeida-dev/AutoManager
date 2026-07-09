@@ -1,0 +1,82 @@
+---
+description: Padrões de testes unitários — JUnit 5 + Mockito
+globs: "**/test/**/*.java"
+alwaysApply: false
+---
+
+# Testes — AutoManager
+
+## Estrutura padrão
+
+```java
+@ExtendWith(MockitoExtension.class)
+class BrandServiceTest {
+
+    @Mock
+    private BrandRepository brandRepository;
+
+    @Mock
+    private BrandMapper brandMapper;
+
+    @InjectMocks
+    private BrandService brandService;
+
+    @Test
+    void createBrandSuccessfully() {
+        // Arrange
+        BrandRequestDTO request = new BrandRequestDTO();
+        request.setName("Toyota");
+        BrandEntity entity = new BrandEntity();
+        when(brandMapper.toEntity(request)).thenReturn(entity);
+
+        // Act
+        brandService.createBrand(request);
+
+        // Assert
+        verify(brandMapper).toEntity(request);
+        verify(brandRepository).save(entity);
+        verifyNoMoreInteractions(brandRepository, brandMapper);
+    }
+}
+```
+
+## Cenários obrigatórios por operação CRUD
+
+| Operação | Cenários mínimos |
+|----------|------------------|
+| Create | sucesso, already exists |
+| GetById | sucesso, not found, invalid id |
+| Update | sucesso, not found, invalid id |
+| Delete | sucesso, not found, invalid id |
+| List | sucesso (lista vazia e com dados) |
+
+## Boas práticas
+
+- **Arrange-Act-Assert** (Given-When-Then) em todo teste
+- Nome do método: `acaoCenarioResultado` (ex.: `createBrandAlreadyExists`)
+- Use `@ParameterizedTest` para IDs inválidos (`null`, `0`, `-1`)
+- `verify(..., never())` para garantir que operações proibidas não ocorrem
+- Teste **Service**, não Controller (unitário). Integration tests são separados.
+
+## Assertivas
+
+```java
+// ✅ AssertJ ou JUnit — mensagem clara
+assertThrows(NotFoundException.class, () -> brandService.getBrand(999));
+assertEquals("Marca não encontrada.", exception.getMessage());
+
+// ❌ Mock desnecessário quando objeto simples basta
+BrandRequestDTO request = mock(BrandRequestDTO.class); // preferir new + setters
+```
+
+## O que NÃO testar
+
+- Getters/setters triviais
+- Código gerado (MapStruct impl, Lombok)
+- Framework Spring (confie no `@SpringBootTest` para integração)
+
+## Cobertura alvo
+
+- Todo **Service** deve ter teste unitário correspondente
+- Caminho feliz + exceções de domínio
+- Meta: refatorar com confiança antes de adicionar features

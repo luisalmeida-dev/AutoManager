@@ -1,0 +1,44 @@
+---
+description: Princípios gerais de engenharia — SOLID, Clean Code, DRY (sempre ativo)
+alwaysApply: true
+---
+
+# Princípios de Engenharia — AutoManager
+
+Referência rápida. Detalhes em `AGENTS.md` e `.cursor/rules/java-backend.mdc`.
+
+## Antes de escrever código
+
+1. Qual camada é responsável? (Controller / Service / Repository)
+2. Já existe padrão similar? (copie a **estrutura**, não o código com bugs)
+3. Isso viola SOLID? Se sim, proponha alternativa.
+
+## Checklist de qualidade (todo PR / alteração)
+
+- [ ] Single Responsibility — cada classe/método faz uma coisa
+- [ ] Sem duplicação — validações e conversões reutilizadas
+- [ ] Validação na borda — `@Valid` nos DTOs de entrada
+- [ ] Exceções de domínio — sem `return null` para erro
+- [ ] Testes unitários do Service — caminho feliz + erros
+- [ ] Nomes claros — sem abreviações obscuras
+- [ ] Sem código morto ou comentado
+
+## Quando o usuário pedir revisão
+
+Compare o código contra:
+1. Camadas corretas (MVC adaptado)
+2. SOLID (especialmente SRP e DIP)
+3. Débitos em `AGENTS.md` — apontar violações existentes
+4. Testes cobrindo cenários de erro
+
+## Escopo de mudança
+
+- Mudanças mínimas e focadas — não refatorar módulos inteiros sem pedido
+- Ao corrigir débito técnico, uma issue por vez
+- Preservar mensagens de erro em português
+
+## Git — nunca sem aprovação
+
+**Proibido** executar commit, push, merge, rebase, criar/deletar branches ou abrir PR sem o usuário pedir e aprovar explicitamente.
+
+Sempre **avisar antes** o que pretende fazer e **aguardar confirmação**.
