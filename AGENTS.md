@@ -25,7 +25,14 @@ Isso inclui — mas não se limita a:
 ```
 ❌ ERRADO: implementar feature e commitar automaticamente
 ❌ ERRADO: "Fiz as alterações e já commitei para você"
-✅ CORRETO: "Alterações prontas. Posso commitar em develop com a mensagem 'feat(Car): ...'?"
+✅ CORRETO: "Alterações prontas. Posso commitar em develop com a mensagem abaixo?"
+```
+feat(db): migra para PostgreSQL com Flyway
+
+- Substitui H2 por PostgreSQL em dev
+- Adiciona V1__INITIAL_SCHEMA.sql
+- Documenta convenções de migrations na base de IA
+```
 ```
 
 ## Stack
@@ -34,7 +41,8 @@ Isso inclui — mas não se limita a:
 |------|------------------|
 | Java | 21 |
 | Spring Boot | 3.4.1 |
-| Banco (dev) | H2 em memória |
+| Banco (dev) | PostgreSQL (Docker local) |
+| Migrations | Flyway (`src/main/resources/db/migration/`) |
 | ORM | Spring Data JPA |
 | Mapeamento | MapStruct 1.6.3 |
 | Testes | JUnit 5 + Mockito |
@@ -46,15 +54,144 @@ Isso inclui — mas não se limita a:
 # Compilar e rodar testes
 .\mvnw.cmd test
 
-# Subir aplicação
+# Subir aplicação (requer PostgreSQL rodando + application-local.properties)
 .\mvnw.cmd spring-boot:run
-
-# Console H2 (com app rodando)
-# http://localhost:8080/h2-console
-# JDBC: jdbc:h2:mem:dcbapp | user: sa | password: password
 ```
 
-**Pré-requisito:** `JAVA_HOME` apontando para JDK 21.
+**Pré-requisitos:** `JAVA_HOME` apontando para JDK 21; PostgreSQL local; `application-local.properties` configurado (copiar de `application-local.properties.example`).
+
+## Configuração da aplicação — OBRIGATÓRIO
+
+Valores sensíveis ou específicos de ambiente **nunca** vão direto no `application.properties` (commitado no Git).
+
+### Regra
+
+1. **`application.properties`** (Git) — estrutura fixa com **placeholders** `${NOME_VARIAVEL}`
+2. **`application-local.properties`** (gitignored) — valores reais do ambiente local
+3. **`application-local.properties.example`** (Git) — template sem credenciais reais; atualizar ao adicionar novos placeholders
+
+```properties
+# ✅ application.properties (commitado)
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PASSWORD}
+
+# ✅ application-local.properties (NÃO commitar)
+DB_URL=jdbc:postgresql://localhost:5432/automanager
+DB_USER=postgres
+DB_PASSWORD=sua_senha
+```
+
+### Ao adicionar nova configuração
+
+1. Defina placeholder em `application.properties`: `minha.config=${MINHA_CONFIG}`
+2. Adicione o valor em `application-local.properties`
+3. Adicione entrada no `application-local.properties.example` (sem valor real)
+4. Em produção, use variáveis de ambiente do servidor com o **mesmo nome** do placeholder
+
+```
+❌ ERRADO: spring.datasource.password=357753 no application.properties
+❌ ERRADO: host/IP de produção hardcoded no application.properties
+✅ CORRETO: spring.datasource.url=${DB_URL} + valor em application-local.properties ou env var
+```
+
+## Banco de dados e Flyway — OBRIGATÓRIO
+
+Schema gerenciado exclusivamente pelo **Flyway**. Hibernate usa `spring.jpa.hibernate.ddl-auto=validate` — não cria nem altera tabelas.
+
+### Migrations
+
+- Local: `src/main/resources/db/migration/`
+- Formato: `V{versão}__{DESCRIÇÃO}.sql`
+- **Descrição sempre em UPPERCASE** (snake_case após o `__`)
+
+```
+✅ V1__INITIAL_SCHEMA.sql
+✅ V3__ADD_PLATE_UNIQUE_CONSTRAINT.sql
+❌ V2__fix_manufacture_year_type.sql
+❌ V4__add-column.sql
+```
+
+### Regras
+
+1. **Nunca editar** migration já aplicada — criar nova versão (`V{N+1}__...`)
+2. Uma alteração de schema por migration (quando possível)
+3. **Toda migration deve ser idempotente** — executar o script várias vezes não pode falhar nem corromper o schema
+4. Histórico em `flyway_schema_history` — não manipular manualmente
+
+### Idempotência — OBRIGATÓRIO
+
+Mesmo que o Flyway rode cada migration uma vez, o SQL deve ser seguro para reexecução (dev, recovery, debug manual).
+
+| Operação | Padrão idempotente |
+|----------|-------------------|
+| Criar tabela | `CREATE TABLE IF NOT EXISTS` |
+| Criar índice | `CREATE INDEX IF NOT EXISTS` |
+| Criar sequence | `CREATE SEQUENCE IF NOT EXISTS` |
+| Adicionar coluna | `ADD COLUMN IF NOT EXISTS` (PostgreSQL 9.1+) |
+| Inserir dado seed | `INSERT ... ON CONFLICT DO NOTHING` |
+| Constraint / FK | Bloco `DO $$ ... IF NOT EXISTS` consultando `information_schema` ou `pg_constraint` |
+
+```sql
+-- ✅ Adicionar coluna de forma idempotente
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS notes TEXT;
+
+-- ✅ Criar índice idempotente
+CREATE INDEX IF NOT EXISTS idx_customers_email ON customers (email);
+
+-- ✅ Constraint condicional (PostgreSQL)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'uk_customers_email'
+    ) THEN
+        ALTER TABLE customers ADD CONSTRAINT uk_customers_email UNIQUE (email);
+    END IF;
+END $$;
+```
+
+```
+❌ ERRADO: CREATE TABLE brands (...) — falha se tabela já existir
+❌ ERRADO: ALTER TABLE customers ADD COLUMN notes TEXT — falha se coluna já existir
+✅ CORRETO: CREATE TABLE IF NOT EXISTS / ADD COLUMN IF NOT EXISTS / bloco DO $$
+```
+
+### Ao alterar estrutura do banco
+
+1. Criar `V{N}__DESCRICAO_EM_UPPERCASE.sql`
+2. Subir a aplicação — Flyway aplica automaticamente
+3. Garantir que entidades JPA continuam alinhadas com o schema (validate)
+
+### Nomenclatura de tabelas — OBRIGATÓRIO
+
+Tabelas e sequences seguem **plural snake_case**, sem sufixos (`_tb`, `_table`):
+
+| Tipo | Padrão | Exemplo |
+|------|--------|---------|
+| Tabela | plural, snake_case | `brands`, `customers`, `service_orders` |
+| Coluna FK | `{entidade_singular}_id` | `brand_id`, `customer_id` |
+| Sequence | `{tabela}_id_seq` | `brands_id_seq`, `service_orders_id_seq` |
+| Constraint UNIQUE | `uk_{tabela}_{coluna}` | `uk_brands_name` |
+| Constraint FK | `fk_{tabela}_{referencia}` | `fk_cars_model` |
+| Índice | `idx_{tabela}_{coluna}` | `idx_cars_customer_id` |
+
+```
+✅ brands, models, customers, cars, users, service_orders
+❌ brand_tb, customer_table, User
+❌ task_tb (usar service_orders para ordens de serviço)
+```
+
+Ao criar nova entidade:
+1. Escolher nome de tabela em **plural snake_case**
+2. Mapear com `@Table(name = "nome_plural")` na Entity
+3. Criar sequence `{tabela}_id_seq` na migration Flyway
+4. Evitar palavras reservadas do PostgreSQL (`user` → `users`)
+
+```
+❌ ERRADO: alterar V1 já aplicada
+❌ ERRADO: usar ddl-auto=update em produção
+✅ CORRETO: V3__ADD_EMAIL_UNIQUE_TO_CUSTOMER.sql
+```
 
 ## Estratégia de branches
 
@@ -93,11 +230,141 @@ fix/user-validation
 docs/api-swagger
 ```
 
-### Commits
+### Commits — OBRIGATÓRIO
 
-Quando o usuário **pedir** um commit, usar formato convencional em português: `feat:`, `fix:`, `test:`, `refactor:`, `docs:`
+**Sempre** seguir Conventional Commits. O padrão completo está **neste arquivo** — não é necessário (nem deve) consultar URLs externas.
 
-Exemplo: `feat(Car): adiciona endpoint de listagem`
+> **Para humanos:** inspiração original em [qoomon cheatsheet](https://gist.github.com/qoomon/5dfcdf8eec66a051ecd85625518cfd13) (apenas leitura complementar; a IA segue o que está documentado abaixo).
+
+#### Estrutura da mensagem
+
+```
+<tipo>(<escopo opcional>): <descrição>
+
+<corpo opcional — bullet points com mudanças importantes>
+
+<rodapé opcional — breaking changes, referências de issue>
+```
+
+Equivalente no Git:
+
+```bash
+git commit -m "<tipo>(<escopo>): <descrição>" \
+  -m "<corpo com bullet points>" \
+  -m "<rodapé se necessário>"
+```
+
+Ou via heredoc (preferido para mensagem completa).
+
+#### Tipos (`type`)
+
+| Tipo | Quando usar |
+|------|-------------|
+| `feat` | Adiciona, ajusta ou remove funcionalidade na API/UI |
+| `fix` | Corrige bug na API/UI (geralmente após um `feat`) |
+| `refactor` | Reestrutura código sem alterar comportamento da API/UI |
+| `perf` | Tipo especial de `refactor` que melhora performance |
+| `style` | Formatação, espaços, ponto-e-vírgula — sem mudança de comportamento |
+| `test` | Adiciona ou corrige testes |
+| `docs` | Apenas documentação |
+| `build` | Build, dependências, versão do projeto (Maven, Docker) |
+| `ops` | Infraestrutura, CI/CD, deploy, monitoramento |
+| `chore` | Tarefas diversas (`.gitignore`, commit inicial, etc.) |
+
+#### Escopo (`scope`)
+
+- **Opcional**, entre parênteses: `feat(Car):`, `fix(db):`
+- Definido pelo projeto — usar módulo/domínio (`Car`, `Customer`, `db`, `Task`)
+- **Não** usar ID de issue como escopo (`JIRA-123` ❌)
+
+#### Descrição (`description`) — obrigatória
+
+- Imperativo, presente: **"adiciona"** — não "adicionou" nem "adicionando"
+- Pensar: *"Este commit vai..."* / *"Este commit deve..."*
+- **Não** capitalizar a primeira letra
+- **Não** terminar com ponto (`.`)
+- Em português
+
+#### Corpo (`body`) — obrigatório neste projeto
+
+No cheatsheet o corpo é opcional; **no AutoManager é obrigatório** com **bullet points** resumindo as mudanças importantes.
+
+- Imperativo, presente
+- Separar do título com **linha em branco**
+- Motivação ou resumo do que mudou (não listar cada arquivo)
+
+#### Rodapé (`footer`) — quando necessário
+
+- Referência de issues: `Closes #123`, `Fixes JIRA-456`
+- **Breaking changes** devem começar com `BREAKING CHANGE:` (obrigatório no rodapé se a descrição não for suficiente)
+
+#### Breaking changes
+
+- Indicar com `!` antes dos `:` no título: `feat(api)!: remove endpoint de listagem`
+- Descrever no rodapé:
+
+```
+feat(api)!: remove endpoint de listagem de marcas
+
+- Remove GET /brands legacy usado apenas pelo frontend antigo
+
+BREAKING CHANGE: endpoint GET /brands/legacy não existe mais. Usar GET /brands.
+```
+
+#### Commits especiais
+
+| Situação | Formato |
+|----------|---------|
+| Commit inicial | `chore: init` |
+| Merge | `Merge branch '<nome>'` (padrão Git) |
+| Revert | `Revert "<assunto do commit revertido>"` (padrão Git) |
+
+#### Regras para o agente
+
+1. **Sempre** Conventional Commits — sem exceção
+2. Título + corpo com bullets ao propor commit ao usuário
+3. Aguardar aprovação explícita antes de `git commit`
+4. Mensagens em **português**
+
+#### Exemplos (padrão AutoManager)
+
+```
+feat(Car): adiciona endpoint de listagem
+
+- Implementa GET /cars no CarController
+- Adiciona findAll no CarService e CarRepository
+- Inclui testes unitários do service
+```
+
+```
+feat(db): migra de H2 para PostgreSQL com Flyway
+
+- Substitui data.sql por migrations versionadas
+- Renomeia tabelas para plural snake_case
+- Configura placeholders em application.properties
+```
+
+```
+fix(Customer): corrige validação de CPF nulo
+
+- Retorna InvalidArgumentException antes de consultar o banco
+- Adiciona teste parametrizado para CPF inválido
+```
+
+```
+docs: atualiza convenções de commit na base de IA
+
+- Documenta padrão Conventional Commits completo no AGENTS.md
+- Cria regra git-commits.mdc no Cursor
+```
+
+```
+❌ ERRADO: "adiciona flyway e postgres"
+❌ ERRADO: Adiciona flyway (maiúscula na descrição)
+❌ ERRADO: feat: migra banco. (ponto final)
+❌ ERRADO: feat(db): migra banco (sem corpo com bullets)
+✅ CORRETO: feat(db): migra para PostgreSQL com Flyway + bullets no corpo
+```
 
 ## Arquitetura
 
@@ -179,6 +446,8 @@ org.workshop.automanager
 | Tipo | Padrão | Exemplo |
 |------|--------|---------|
 | Entity | `*Entity` | `BrandEntity` |
+| Tabela (SQL) | plural snake_case | `brands`, `service_orders` |
+| Sequence | `{tabela}_id_seq` | `brands_id_seq` |
 | Repository | `*Repository` | `BrandRepository` |
 | Service | `*Service` | `BrandService` |
 | Controller | `*Controller` | `BrandController` |
@@ -259,7 +528,7 @@ Use esta lista para validar/refatorar código existente:
 | 6 | `UserController` sem `@Valid` | Validação na borda | Adicionar `@Valid` |
 | 7 | Check redundante após `orElseThrow` | Clean Code | Remover dead code |
 | 8 | WebSocket no pom sem uso | YAGNI | Implementar ou remover dependência |
-| 9 | `data.sql` DDL manual vs JPA | Consistência | Unificar estratégia de schema |
+| 9 | ~~`data.sql` DDL manual vs JPA~~ | — | ✅ Resolvido — Flyway + `ddl-auto=validate` |
 | 10 | Car CRUD incompleto | — | Finalizar seguindo template |
 | 11 | Task sem implementação | — | Implementar (core do negócio) |
 
@@ -267,10 +536,13 @@ Use esta lista para validar/refatorar código existente:
 
 - `docs/ARCHITECTURE.md` — visão técnica, domínio, endpoints, roadmap
 - `.cursor/rules/java-backend.mdc` — regras Java/Spring detalhadas
+- `.cursor/rules/application-config.mdc` — placeholders e `application-local.properties`
+- `.cursor/rules/database-migrations.mdc` — Flyway e nomenclatura UPPERCASE
+- `.cursor/rules/git-commits.mdc` — Conventional Commits e formato da mensagem
 - `.cursor/rules/testing.mdc` — padrões de teste
 
 ## Idioma
 
 - **Código** (classes, métodos, variáveis): inglês
 - **Mensagens de erro ao usuário**: português
-- **Commits**: português, formato convencional (`feat:`, `fix:`, `test:`, `refactor:`)
+- **Commits**: português, Conventional Commits — título + corpo com bullets (ver seção Commits neste arquivo)

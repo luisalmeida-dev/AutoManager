@@ -4,10 +4,11 @@ import jakarta.persistence.*;
 import org.workshop.automanager.enums.RoleEnum;
 
 @Entity
-@Table(name = "customer_tb")
+@Table(name = "customers")
 public class CustomerEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "customer_tb_seq")
+    @SequenceGenerator(name = "customers_id_seq", sequenceName = "customers_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customers_id_seq")
     @Column(name = "id")
     private int id;
 

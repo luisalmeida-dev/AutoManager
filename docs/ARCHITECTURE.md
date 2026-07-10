@@ -64,12 +64,12 @@ Customer (cliente) ────┘         │
 
 | Entidade | Tabela | Descrição |
 |----------|--------|-----------|
-| `BrandEntity` | `brand_tb` | Marca automotiva (Toyota, Ford) |
-| `ModelEntity` | `model_tb` | Modelo vinculado a uma marca |
-| `CustomerEntity` | `customer_tb` | Cliente da oficina (CPF único) |
-| `CarEntity` | `car_tb` | Veículo do cliente (placa única) |
-| `UserEntity` | `user_tb` | Funcionário interno (login único) |
-| `TaskEntity` | `task_tb` | Ordem de serviço |
+| `BrandEntity` | `brands` | Marca automotiva (Toyota, Ford) |
+| `ModelEntity` | `models` | Modelo vinculado a uma marca |
+| `CustomerEntity` | `customers` | Cliente da oficina (CPF único) |
+| `CarEntity` | `cars` | Veículo do cliente (placa única) |
+| `UserEntity` | `users` | Funcionário interno (login único) |
+| `TaskEntity` | `service_orders` | Ordem de serviço |
 
 ### Enumerações
 

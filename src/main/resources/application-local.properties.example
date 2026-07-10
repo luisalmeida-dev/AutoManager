@@ -1,0 +1,6 @@
+# Copie para application-local.properties (arquivo gitignored)
+# Todas as configurações sensíveis ou específicas do ambiente local ficam aqui.
+
+DB_URL=jdbc:postgresql://localhost:5432/automanager
+DB_USER=postgres
+DB_PASSWORD=sua_senha_postgres

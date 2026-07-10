@@ -7,10 +7,11 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table(name = "task_tb")
+@Table(name = "service_orders")
 public class TaskEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "task_tb_seq")
+    @SequenceGenerator(name = "service_orders_id_seq", sequenceName = "service_orders_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "service_orders_id_seq")
     @Column(name = "id")
     private int id;
 
@@ -32,9 +33,11 @@ public class TaskEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "start_date")
     private Date startDate;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "end_date")
     private Date endDate;
 

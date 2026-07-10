@@ -92,6 +92,9 @@ Lance exceções no **Service**. Nunca retorne `null` para "não encontrado".
 - `@ManyToOne(fetch = FetchType.LAZY)` para relacionamentos
 - Evite N+1: use `@EntityGraph` ou fetch join quando listar com relações
 - IDs: `Integer` ou `int` conforme padrão da entidade existente
+- Schema via **Flyway** — não alterar tabelas com `ddl-auto=update`
+- IDs com `@SequenceGenerator` + `GenerationType.SEQUENCE` (sequences criadas nas migrations)
+- Tabelas em **plural snake_case** (`brands`, `service_orders`) — ver `database-migrations.mdc`
 
 ## Segurança (meta — ainda não implementado)
 

@@ -22,6 +22,10 @@ Referência rápida. Detalhes em `AGENTS.md` e `.cursor/rules/java-backend.mdc`.
 - [ ] Testes unitários do Service — caminho feliz + erros
 - [ ] Nomes claros — sem abreviações obscuras
 - [ ] Sem código morto ou comentado
+- [ ] Novas configs em `application.properties` usam placeholder `${VAR}` — valor em `application-local.properties`
+- [ ] Nova migration Flyway com descrição em **UPPERCASE** (`V{N}__DESCRICAO.sql`)
+- [ ] Migration **idempotente** (`IF NOT EXISTS`, `ADD COLUMN IF NOT EXISTS`, etc.)
+- [ ] Nova tabela em **plural snake_case** (`brands`, não `brand_tb`)
 
 ## Quando o usuário pedir revisão
 
@@ -42,3 +46,11 @@ Compare o código contra:
 **Proibido** executar commit, push, merge, rebase, criar/deletar branches ou abrir PR sem o usuário pedir e aprovar explicitamente.
 
 Sempre **avisar antes** o que pretende fazer e **aguardar confirmação**.
+
+## Commits — ao propor ao usuário
+
+Seguir seção **Commits** do `AGENTS.md` (documentação local — sem buscar links externos).
+
+- Formato: `tipo(escopo): descrição` + corpo com bullets + rodapé se breaking change
+- Tipos: `feat`, `fix`, `refactor`, `perf`, `style`, `test`, `docs`, `build`, `ops`, `chore`
+- Descrição: imperativo, português, sem maiúscula inicial, sem ponto final

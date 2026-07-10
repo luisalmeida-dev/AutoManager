@@ -1,0 +1,56 @@
+---
+description: Conventional Commits — formato obrigatório de mensagens de commit
+alwaysApply: true
+---
+
+# Commits — AutoManager
+
+Padrão completo em `AGENTS.md` (seção Commits). **Não acessar URLs externas** — seguir apenas a documentação local.
+
+## Estrutura
+
+```
+<tipo>(<escopo>): <descrição>
+
+<corpo — bullet points obrigatório no AutoManager>
+
+<rodapé — opcional: BREAKING CHANGE, Closes #123>
+```
+
+## Tipos
+
+`feat` | `fix` | `refactor` | `perf` | `style` | `test` | `docs` | `build` | `ops` | `chore`
+
+## Descrição (título)
+
+- Imperativo, presente, português: `adiciona` (não `adicionou`)
+- Sem maiúscula inicial, sem ponto final
+- Breaking change: `feat(api)!: remove endpoint`
+
+## Corpo (obrigatório neste projeto)
+
+Bullet points com mudanças importantes. Linha em branco após o título.
+
+## Rodapé
+
+- Issues: `Closes #123`
+- Breaking: `BREAKING CHANGE: descrição do impacto`
+
+## Ao propor commit
+
+Apresentar título + corpo completos. **Aguardar aprovação** antes de `git commit`.
+
+```
+feat(db): migra para PostgreSQL com Flyway
+
+- Substitui H2 por PostgreSQL em dev
+- Adiciona V1__INITIAL_SCHEMA.sql
+- Documenta convenções na base de IA
+```
+
+```
+❌ Sem tipo conventional
+❌ Adiciona X (maiúscula / sem tipo)
+❌ Só título, sem bullets
+❌ Commitar sem aprovação do usuário
+```

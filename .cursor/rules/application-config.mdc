@@ -1,0 +1,33 @@
+---
+description: Configuração Spring Boot — placeholders, application-local e secrets
+globs: "**/application*.properties"
+alwaysApply: false
+---
+
+# Configuração — AutoManager
+
+## Regra principal
+
+**Nunca** colocar valores sensíveis ou específicos de ambiente diretamente em `application.properties` (commitado).
+
+| Arquivo | Git | Conteúdo |
+|---------|-----|----------|
+| `application.properties` | Sim | Placeholders `${VAR}` + config fixa (Flyway, JPA) |
+| `application-local.properties` | Não | Valores reais (URL, user, senha, etc.) |
+| `application-local.properties.example` | Sim | Template sem credenciais |
+
+## Ao adicionar nova propriedade
+
+1. `application.properties` → `minha.prop=${MINHA_PROP}`
+2. `application-local.properties` → `MINHA_PROP=valor_local`
+3. `application-local.properties.example` → `MINHA_PROP=exemplo_ou_placeholder`
+
+## Produção
+
+Mesmos nomes de variável via env vars do servidor (`DB_URL`, `DB_PASSWORD`, etc.).
+
+```
+❌ spring.datasource.password=senha123
+❌ spring.datasource.url=jdbc:postgresql://54.x.x.x:5432/prod
+✅ spring.datasource.password=${DB_PASSWORD}
+```

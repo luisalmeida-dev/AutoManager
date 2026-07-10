@@ -1,0 +1,72 @@
+---
+description: Flyway migrations — nomenclatura, versionamento e alterações de schema
+globs: "**/db/migration/**/*.sql"
+alwaysApply: false
+---
+
+# Flyway Migrations — AutoManager
+
+Schema do banco é gerenciado **somente** pelo Flyway. Hibernate: `ddl-auto=validate`.
+
+## Nomenclatura — OBRIGATÓRIO
+
+Formato: `V{versão}__{DESCRIÇÃO}.sql`
+
+**Descrição sempre em UPPERCASE** (snake_case):
+
+```
+✅ V1__INITIAL_SCHEMA.sql
+✅ V4__ADD_STATUS_INDEX_TO_TASK.sql
+❌ V2__fix_column_type.sql
+❌ V3__AddEmailUnique.sql
+```
+
+## Nomenclatura de tabelas — OBRIGATÓRIO
+
+- **Plural snake_case** — sem sufixo `_tb` ou `_table`
+- Sequences: `{tabela}_id_seq` (ex.: `brands_id_seq`)
+- FKs: `{entidade}_id` (ex.: `brand_id`)
+- Evitar palavras reservadas PostgreSQL (`users`, não `user`)
+
+```
+✅ brands, customers, service_orders
+❌ brand_tb, task_tb, User
+```
+
+## Regras
+
+1. **Nunca editar** migration já aplicada — criar `V{N+1}__...`
+2. Uma mudança de schema por arquivo quando possível
+3. **Toda migration deve ser idempotente** — reexecutar o script não pode falhar
+4. Alinhar entidades JPA com o schema após a migration
+5. Não usar `ddl-auto=create` ou `update` em dev/prod
+
+## Idempotência — OBRIGATÓRIO
+
+Use cláusulas condicionais do PostgreSQL:
+
+```sql
+CREATE TABLE IF NOT EXISTS brands (...);
+CREATE INDEX IF NOT EXISTS idx_brands_name ON brands (name);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS notes TEXT;
+
+-- Constraints: verificar antes de criar
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'uk_customers_email') THEN
+        ALTER TABLE customers ADD CONSTRAINT uk_customers_email UNIQUE (email);
+    END IF;
+END $$;
+```
+
+```
+❌ CREATE TABLE brands (...)        — não idempotente
+❌ ALTER TABLE ... ADD COLUMN x ...  — não idempotente
+✅ IF NOT EXISTS / ON CONFLICT DO NOTHING
+```
+
+## Fluxo
+
+```
+Alterou tabela/coluna → V{N}__DESCRICAO.sql → spring-boot:run → Flyway aplica
+```

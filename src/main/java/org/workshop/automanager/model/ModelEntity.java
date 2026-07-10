@@ -3,10 +3,11 @@ package org.workshop.automanager.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "model_tb")
+@Table(name = "models")
 public class ModelEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "model_tb_seq")
+    @SequenceGenerator(name = "models_id_seq", sequenceName = "models_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "models_id_seq")
     @Column(name = "id")
     private int id;
 
