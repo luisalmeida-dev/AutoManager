@@ -253,8 +253,8 @@ Mapa entre o código atual e os princípios definidos em `AGENTS.md`. Use para p
 ### Fase 4 — Evolução
 
 - [ ] WebSocket para status de ordens em tempo real
-- [ ] OpenAPI/Swagger para documentação da API
-- [ ] Migrar H2 → PostgreSQL para produção
+- [x] OpenAPI/Swagger para documentação da API
+- [x] Migrar H2 → PostgreSQL para produção
 - [ ] Testes de integração (`@SpringBootTest`)
 - [ ] Frontend (se aplicável)
 
@@ -264,7 +264,7 @@ Registre aqui quando tomar decisões — a IA usará como referência:
 
 | Decisão | Opções | Status |
 |---------|--------|--------|
-| Estratégia de schema DB | JPA auto-ddl vs Flyway/Liquibase | Pendente |
+| Estratégia de schema DB | Flyway (migrations versionadas) | Definido |
 | Autenticação | JWT vs Session | Pendente |
 | Customer por CPF vs ID | Manter CPF ou padronizar ID | Pendente |
 | WebSocket | Implementar ou remover dependência | Pendente |

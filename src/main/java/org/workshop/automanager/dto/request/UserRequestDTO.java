@@ -1,23 +1,30 @@
 package org.workshop.automanager.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.workshop.automanager.enums.RoleEnum;
 
+@Schema(description = "Dados para criar ou atualizar um usuário")
 public class UserRequestDTO {
     @NotNull(message = "O campo [NAME] não pode ser nulo.")
     @NotBlank(message = "O campo [NAME] não pode ser vazio.")
+    @Schema(description = "Nome do usuário", example = "Maria Gestora")
     private String name;
 
     @NotNull(message = "O campo [LOGIN] não pode ser nulo.")
     @NotBlank(message = "O campo [LOGIN] não pode ser vazio.")
+    @Schema(description = "Login de acesso", example = "maria.gestora")
     private String login;
+
     @NotNull(message = "O campo [PASSWORD] não pode ser nulo.")
     @NotBlank(message = "O campo [PASSWORD] não pode ser vazio.")
+    @Schema(description = "Senha", example = "senha123")
     private String password;
 
     @NotNull(message = "O campo [ROLE] não pode ser nulo.")
     @NotBlank(message = "O campo [ROLE] não pode ser vazio.")
+    @Schema(description = "Papel do usuário", example = "MANAGER")
     private RoleEnum Role;
 
     public UserRequestDTO() {

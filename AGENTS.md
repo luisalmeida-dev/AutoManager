@@ -430,6 +430,7 @@ Todo código novo **e refatorações** devem respeitar:
 
 ```
 org.workshop.automanager
+├── config/         # Configuração (OpenAPI, etc.)
 ├── controller/
 ├── service/
 ├── repository/
@@ -463,6 +464,26 @@ org.workshop.automanager
 - `@Valid` em todo `@RequestBody` de entrada
 - Retornos: `201 Created` (POST), `200 OK` (GET), `204 No Content` (PUT/DELETE sem body)
 - Controller **não** contém regra de negócio
+
+### Documentação da API (OpenAPI) — OBRIGATÓRIO
+
+**OpenAPI/Swagger é a fonte de verdade** da documentação e contrato da API. Não manter coleção Postman versionada no Git.
+
+| Recurso | URL (app rodando) |
+|---------|-------------------|
+| Swagger UI | `http://localhost:8080/swagger-ui.html` |
+| Spec OpenAPI (JSON) | `http://localhost:8080/v3/api-docs` |
+
+**Ao criar ou alterar endpoints:**
+
+1. Adicionar `@Tag(name = "...", description = "...")` no controller
+2. Adicionar `@Schema` com `description` e `example` nos campos dos **Request DTOs**
+3. Novos controllers devem aparecer agrupados no Swagger UI automaticamente
+4. **Não** duplicar documentação em arquivos externos — o código gera a spec
+
+**Importar no Postman:** Postman → Import → Link → `http://localhost:8080/v3/api-docs`
+
+Configuração central em `config/OpenApiConfig.java` e `application.properties` (`springdoc.*`).
 
 ### Service
 

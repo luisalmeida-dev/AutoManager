@@ -1,5 +1,6 @@
 package org.workshop.automanager.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/models")
+@Tag(name = "Models", description = "Cadastro de modelos vinculados a marcas")
 public class ModelController {
     @Autowired
     private ModelService modelService;
