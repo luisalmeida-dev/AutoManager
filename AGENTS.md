@@ -325,6 +325,7 @@ BREAKING CHANGE: endpoint GET /brands/legacy não existe mais. Usar GET /brands.
 2. Título + corpo com bullets ao propor commit ao usuário
 3. Aguardar aprovação explícita antes de `git commit`
 4. Mensagens em **português**
+5. **Nunca** incluir menção a Cursor, IA, agente, Copilot ou ferramenta na mensagem de commit — o commit deve parecer escrito por um desenvolvedor humano
 
 #### Exemplos (padrão AutoManager)
 
@@ -363,6 +364,8 @@ docs: atualiza convenções de commit na base de IA
 ❌ ERRADO: Adiciona flyway (maiúscula na descrição)
 ❌ ERRADO: feat: migra banco. (ponto final)
 ❌ ERRADO: feat(db): migra banco (sem corpo com bullets)
+❌ ERRADO: feat(api): adiciona endpoint (feito pelo Cursor)
+❌ ERRADO: Co-authored-by: Cursor / menção a IA no corpo ou rodapé
 ✅ CORRETO: feat(db): migra para PostgreSQL com Flyway + bullets no corpo
 ```
 
