@@ -187,6 +187,24 @@ Ao criar nova entidade:
 3. Criar sequence `{tabela}_id_seq` na migration Flyway
 4. Evitar palavras reservadas do PostgreSQL (`user` → `users`)
 
+### Relacionamentos N:N — OBRIGATÓRIO
+
+Bancos relacionais **não** suportam N:N diretamente. Toda relação muitos-para-muitos deve ser quebrada em duas relações **1:N** através de uma **tabela de junção** (pivô/associativa) que cruza os IDs das duas entidades.
+
+- Nome no plural unindo as entidades: `employee_specialties`, `catalog_service_specialties`
+- FK para cada lado + `UNIQUE` no par para evitar duplicidade
+- Em multi-tenant: incluir `workshop_id` e garantir que as duas pontas são da mesma oficina
+- Preferir surrogate `id` a PK composta (facilita histórico/eventos)
+- Colunas extras podem qualificar a relação (`assigned_by_employee_id`, `role`, `started_at`)
+
+```
+❌ ERRADO: specialty_1_id, specialty_2_id (colunas repetidas)
+❌ ERRADO: JSON/array de IDs sem FK (perde integridade referencial)
+✅ CORRETO: tabela `{a}_{b}` com FKs + UNIQUE (a_id, b_id)
+```
+
+Detalhes completos em `.cursor/rules/database-migrations.mdc`.
+
 ```
 ❌ ERRADO: alterar V1 já aplicada
 ❌ ERRADO: usar ddl-auto=update em produção

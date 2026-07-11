@@ -65,6 +65,43 @@ END $$;
 ✅ IF NOT EXISTS / ON CONFLICT DO NOTHING
 ```
 
+## Relacionamentos N:N — OBRIGATÓRIO
+
+Bancos relacionais **não suportam** N:N diretamente. Toda relação muitos-para-muitos deve ser quebrada em **duas relações 1:N** por meio de uma **tabela de junção** (também chamada pivô ou associativa).
+
+### Estrutura mínima da tabela de junção
+
+```sql
+CREATE TABLE {a}_{b} (
+    id                  INTEGER PRIMARY KEY,
+    workshop_id         INTEGER NOT NULL,        -- em modelos multi-tenant
+    {a_singular}_id     INTEGER NOT NULL REFERENCES {a}(id),
+    {b_singular}_id     INTEGER NOT NULL REFERENCES {b}(id),
+    created_at          TIMESTAMPTZ NOT NULL,
+    -- campos de auditoria/qualificação (opcionais)
+    CONSTRAINT uk_{a}_{b} UNIQUE ({a_singular}_id, {b_singular}_id)
+);
+```
+
+### Boas práticas
+
+- **Nome no plural** unindo as duas entidades: `employee_specialties`, `catalog_service_specialties`
+- `UNIQUE` no par de FKs para evitar duplicidade
+- Em multi-tenant: incluir `workshop_id` na junção e garantir que as duas pontas pertencem à mesma oficina
+- Preferir **surrogate key** (`id`) a PK composta — facilita histórico e eventos
+- Colunas extras qualificam a relação (`assigned_by_employee_id`, `role`, `started_at`)
+
+### Quando NÃO criar junção
+
+- Um lado tem no máximo 1 do outro → é **1:N**, use FK simples
+- Ex.: `vehicles.customer_id` — cada carro tem **um** dono no MVP
+
+```
+❌ ERRADO: colunas repetidas (specialty_1_id, specialty_2_id) para representar N:N
+❌ ERRADO: array/JSON de IDs no lugar de FK (perde integridade referencial)
+✅ CORRETO: tabela de junção com FKs + UNIQUE no par
+```
+
 ## Fluxo
 
 ```
