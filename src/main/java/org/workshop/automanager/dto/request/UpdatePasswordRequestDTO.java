@@ -1,8 +1,16 @@
 package org.workshop.automanager.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Dados para alteração de senha de um usuário")
 public class UpdatePasswordRequestDTO {
+    @Schema(description = "ID do usuário", example = "1")
     private Integer id;
+
+    @Schema(description = "Senha atual", example = "senha123")
     private String oldPassword;
+
+    @Schema(description = "Nova senha", example = "novaSenha456")
     private String newPassword;
 
     public UpdatePasswordRequestDTO() {

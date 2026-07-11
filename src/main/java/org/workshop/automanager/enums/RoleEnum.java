@@ -1,5 +1,8 @@
 package org.workshop.automanager.enums;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Papéis de usuário/cliente no sistema", enumAsRef = true)
 public enum RoleEnum {
     MANAGER("Gestor"), PAINTER("Pintor"), TINSMITH("Funileiro"), CUSTOMER("Cliente");
 

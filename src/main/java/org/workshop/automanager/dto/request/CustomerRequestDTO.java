@@ -1,18 +1,26 @@
 package org.workshop.automanager.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.workshop.automanager.enums.RoleEnum;
 
+@Schema(description = "Dados para criar ou atualizar um cliente")
 public class CustomerRequestDTO {
+    @Schema(description = "Nome completo", example = "João Silva")
     private String name;
 
+    @Schema(description = "CPF (somente números)", example = "12345678901")
     private String cpf;
 
+    @Schema(description = "E-mail", example = "joao.silva@email.com")
     private String email;
 
+    @Schema(description = "Telefone", example = "11999998888")
     private String phone;
 
+    @Schema(description = "Endereço", example = "Rua das Flores, 100")
     private String address;
 
+    @Schema(description = "Papel do cliente no sistema", example = "CUSTOMER")
     private RoleEnum role;
 
     public String getName() {

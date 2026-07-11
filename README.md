@@ -20,7 +20,8 @@ Projeto em fase inicial. Backend REST parcialmente implementado.
 - Java 21
 - Spring Boot 3.4.1
 - Spring Data JPA
-- H2 Database (desenvolvimento)
+- PostgreSQL + Flyway
+- SpringDoc OpenAPI (Swagger UI)
 - MapStruct
 - JUnit 5 + Mockito
 
@@ -28,6 +29,7 @@ Projeto em fase inicial. Backend REST parcialmente implementado.
 
 - JDK 21 (`JAVA_HOME` configurado)
 - Git
+- PostgreSQL (Docker ou local) — ver `application-local.properties.example`
 
 ## Como rodar
 
@@ -44,7 +46,11 @@ git checkout develop
 
 A API sobe em `http://localhost:8080`.
 
-Console H2: `http://localhost:8080/h2-console`
+**Documentação interativa (Swagger UI):** `http://localhost:8080/swagger-ui.html`
+
+**Spec OpenAPI (importar no Postman):** `http://localhost:8080/v3/api-docs`
+
+Copie `application-local.properties.example` para `application-local.properties` e configure o PostgreSQL antes de subir a aplicação.
 
 ## Estrutura
 

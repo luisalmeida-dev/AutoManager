@@ -1,5 +1,6 @@
 package org.workshop.automanager.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/customers")
+@Tag(name = "Customers", description = "Cadastro de clientes da oficina")
 public class CustomerController {
     @Autowired
     private CustomerService customerService;

@@ -95,6 +95,7 @@ Lance exceções no **Service**. Nunca retorne `null` para "não encontrado".
 - Schema via **Flyway** — não alterar tabelas com `ddl-auto=update`
 - IDs com `@SequenceGenerator` + `GenerationType.SEQUENCE` (sequences criadas nas migrations)
 - Tabelas em **plural snake_case** (`brands`, `service_orders`) — ver `database-migrations.mdc`
+- Documentação da API via **OpenAPI** — ver `api-documentation.mdc`
 
 ## Segurança (meta — ainda não implementado)
 

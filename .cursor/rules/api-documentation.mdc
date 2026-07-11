@@ -1,0 +1,42 @@
+---
+description: OpenAPI/Swagger — documentação da API como fonte de verdade
+globs: "**/controller/**/*.java,**/dto/**/*.java,**/config/OpenApiConfig.java"
+alwaysApply: false
+---
+
+# Documentação da API — AutoManager
+
+OpenAPI (SpringDoc) é a **única fonte de verdade** da documentação da API.
+
+## URLs
+
+| Recurso | Path |
+|---------|------|
+| Swagger UI | `/swagger-ui.html` |
+| Spec JSON | `/v3/api-docs` |
+
+## Ao criar ou alterar endpoint
+
+1. `@Tag(name = "...", description = "...")` no controller
+2. `@Schema(description = "...", example = "...")` nos campos dos Request DTOs
+3. Não criar/manter coleção Postman no Git — importar de `/v3/api-docs`
+
+## Exemplo
+
+```java
+@Tag(name = "Brands", description = "Cadastro de marcas de veículos")
+@RestController
+@RequestMapping("/brands")
+public class BrandController { ... }
+
+@Schema(description = "Dados para criar ou atualizar uma marca")
+public class BrandRequestDTO {
+    @Schema(description = "Nome da marca", example = "Toyota")
+    private String name;
+}
+```
+
+## Configuração
+
+- `config/OpenApiConfig.java` — metadados da API (título, versão)
+- `application.properties` — `springdoc.*`

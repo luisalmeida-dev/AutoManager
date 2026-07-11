@@ -1,5 +1,6 @@
 package org.workshop.automanager.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@Tag(name = "Users", description = "Cadastro de usuários do sistema (funcionários)")
 public class UserController {
     @Autowired
     private UserService userService;
