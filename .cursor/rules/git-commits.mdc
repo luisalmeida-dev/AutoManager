@@ -40,6 +40,8 @@ Bullet points com mudanças importantes. Linha em branco após o título.
 
 Apresentar título + corpo completos. **Aguardar aprovação** antes de `git commit`.
 
+**Nunca** incluir menção a Cursor, IA, agente ou ferramenta na mensagem — o commit deve parecer escrito por um desenvolvedor humano.
+
 ```
 feat(db): migra para PostgreSQL com Flyway
 
@@ -53,4 +55,5 @@ feat(db): migra para PostgreSQL com Flyway
 ❌ Adiciona X (maiúscula / sem tipo)
 ❌ Só título, sem bullets
 ❌ Commitar sem aprovação do usuário
+❌ Menção a Cursor, IA, agente ou ferramenta na mensagem
 ```

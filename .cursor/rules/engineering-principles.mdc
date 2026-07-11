@@ -54,3 +54,4 @@ Seguir seção **Commits** do `AGENTS.md` (documentação local — sem buscar l
 - Formato: `tipo(escopo): descrição` + corpo com bullets + rodapé se breaking change
 - Tipos: `feat`, `fix`, `refactor`, `perf`, `style`, `test`, `docs`, `build`, `ops`, `chore`
 - Descrição: imperativo, português, sem maiúscula inicial, sem ponto final
+- **Sem** menção a Cursor, IA ou ferramenta na mensagem de commit

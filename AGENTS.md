@@ -187,6 +187,24 @@ Ao criar nova entidade:
 3. Criar sequence `{tabela}_id_seq` na migration Flyway
 4. Evitar palavras reservadas do PostgreSQL (`user` → `users`)
 
+### Relacionamentos N:N — OBRIGATÓRIO
+
+Bancos relacionais **não** suportam N:N diretamente. Toda relação muitos-para-muitos deve ser quebrada em duas relações **1:N** através de uma **tabela de junção** (pivô/associativa) que cruza os IDs das duas entidades.
+
+- Nome no plural unindo as entidades: `employee_specialties`, `catalog_service_specialties`
+- FK para cada lado + `UNIQUE` no par para evitar duplicidade
+- Em multi-tenant: incluir `workshop_id` e garantir que as duas pontas são da mesma oficina
+- Preferir surrogate `id` a PK composta (facilita histórico/eventos)
+- Colunas extras podem qualificar a relação (`assigned_by_employee_id`, `role`, `started_at`)
+
+```
+❌ ERRADO: specialty_1_id, specialty_2_id (colunas repetidas)
+❌ ERRADO: JSON/array de IDs sem FK (perde integridade referencial)
+✅ CORRETO: tabela `{a}_{b}` com FKs + UNIQUE (a_id, b_id)
+```
+
+Detalhes completos em `.cursor/rules/database-migrations.mdc`.
+
 ```
 ❌ ERRADO: alterar V1 já aplicada
 ❌ ERRADO: usar ddl-auto=update em produção
@@ -325,6 +343,7 @@ BREAKING CHANGE: endpoint GET /brands/legacy não existe mais. Usar GET /brands.
 2. Título + corpo com bullets ao propor commit ao usuário
 3. Aguardar aprovação explícita antes de `git commit`
 4. Mensagens em **português**
+5. **Nunca** incluir menção a Cursor, IA, agente, Copilot ou ferramenta na mensagem de commit — o commit deve parecer escrito por um desenvolvedor humano
 
 #### Exemplos (padrão AutoManager)
 
@@ -363,6 +382,8 @@ docs: atualiza convenções de commit na base de IA
 ❌ ERRADO: Adiciona flyway (maiúscula na descrição)
 ❌ ERRADO: feat: migra banco. (ponto final)
 ❌ ERRADO: feat(db): migra banco (sem corpo com bullets)
+❌ ERRADO: feat(api): adiciona endpoint (feito pelo Cursor)
+❌ ERRADO: Co-authored-by: Cursor / menção a IA no corpo ou rodapé
 ✅ CORRETO: feat(db): migra para PostgreSQL com Flyway + bullets no corpo
 ```
 
