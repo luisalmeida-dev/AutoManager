@@ -14,12 +14,12 @@ import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "customers")
-public class CustomerEntity {
+@Table(name = "employees")
+public class EmployeeEntity {
 
     @Id
-    @SequenceGenerator(name = "customers_id_seq", sequenceName = "customers_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customers_id_seq")
+    @SequenceGenerator(name = "employees_id_seq", sequenceName = "employees_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "employees_id_seq")
     @Column(name = "id")
     private Integer id;
 
@@ -30,17 +30,17 @@ public class CustomerEntity {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "cpf", length = 11)
-    private String cpf;
+    @Column(name = "login", nullable = false, length = 50)
+    private String login;
 
     @Column(name = "email", length = 100)
     private String email;
 
-    @Column(name = "phone", length = 20)
-    private String phone;
+    @Column(name = "password", nullable = false, length = 255)
+    private String password;
 
-    @Column(name = "address", length = 200)
-    private String address;
+    @Column(name = "access_role", nullable = false, length = 30)
+    private String accessRole;
 
     @Column(name = "active", nullable = false)
     private Boolean active = Boolean.TRUE;
@@ -75,12 +75,12 @@ public class CustomerEntity {
         this.name = name;
     }
 
-    public String getCpf() {
-        return cpf;
+    public String getLogin() {
+        return login;
     }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getEmail() {
@@ -91,20 +91,20 @@ public class CustomerEntity {
         this.email = email;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public String getAddress() {
-        return address;
+    public String getAccessRole() {
+        return accessRole;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setAccessRole(String accessRole) {
+        this.accessRole = accessRole;
     }
 
     public Boolean getActive() {

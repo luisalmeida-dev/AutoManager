@@ -11,15 +11,16 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "customers")
-public class CustomerEntity {
+@Table(name = "catalog_services")
+public class CatalogServiceEntity {
 
     @Id
-    @SequenceGenerator(name = "customers_id_seq", sequenceName = "customers_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customers_id_seq")
+    @SequenceGenerator(name = "catalog_services_id_seq", sequenceName = "catalog_services_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "catalog_services_id_seq")
     @Column(name = "id")
     private Integer id;
 
@@ -27,29 +28,24 @@ public class CustomerEntity {
     @JoinColumn(name = "workshop_id", nullable = false)
     private WorkshopEntity workshop;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "specialty_id")
+    private SpecialtyEntity specialty;
+
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "cpf", length = 11)
-    private String cpf;
+    @Column(name = "description")
+    private String description;
 
-    @Column(name = "email", length = 100)
-    private String email;
-
-    @Column(name = "phone", length = 20)
-    private String phone;
-
-    @Column(name = "address", length = 200)
-    private String address;
+    @Column(name = "default_price", precision = 10, scale = 2)
+    private BigDecimal defaultPrice;
 
     @Column(name = "active", nullable = false)
     private Boolean active = Boolean.TRUE;
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt;
 
     public Integer getId() {
         return id;
@@ -67,6 +63,14 @@ public class CustomerEntity {
         this.workshop = workshop;
     }
 
+    public SpecialtyEntity getSpecialty() {
+        return specialty;
+    }
+
+    public void setSpecialty(SpecialtyEntity specialty) {
+        this.specialty = specialty;
+    }
+
     public String getName() {
         return name;
     }
@@ -75,36 +79,20 @@ public class CustomerEntity {
         this.name = name;
     }
 
-    public String getCpf() {
-        return cpf;
+    public String getDescription() {
+        return description;
     }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getEmail() {
-        return email;
+    public BigDecimal getDefaultPrice() {
+        return defaultPrice;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
+    public void setDefaultPrice(BigDecimal defaultPrice) {
+        this.defaultPrice = defaultPrice;
     }
 
     public Boolean getActive() {
@@ -121,13 +109,5 @@ public class CustomerEntity {
 
     public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }
