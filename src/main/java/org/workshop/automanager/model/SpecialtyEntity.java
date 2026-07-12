@@ -14,12 +14,12 @@ import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "customers")
-public class CustomerEntity {
+@Table(name = "specialties")
+public class SpecialtyEntity {
 
     @Id
-    @SequenceGenerator(name = "customers_id_seq", sequenceName = "customers_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customers_id_seq")
+    @SequenceGenerator(name = "specialties_id_seq", sequenceName = "specialties_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "specialties_id_seq")
     @Column(name = "id")
     private Integer id;
 
@@ -27,29 +27,17 @@ public class CustomerEntity {
     @JoinColumn(name = "workshop_id", nullable = false)
     private WorkshopEntity workshop;
 
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @Column(name = "cpf", length = 11)
-    private String cpf;
-
-    @Column(name = "email", length = 100)
-    private String email;
-
-    @Column(name = "phone", length = 20)
-    private String phone;
-
-    @Column(name = "address", length = 200)
-    private String address;
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "active", nullable = false)
     private Boolean active = Boolean.TRUE;
 
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt;
 
     public Integer getId() {
         return id;
@@ -75,36 +63,12 @@ public class CustomerEntity {
         this.name = name;
     }
 
-    public String getCpf() {
-        return cpf;
+    public String getDescription() {
+        return description;
     }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Boolean getActive() {
@@ -121,13 +85,5 @@ public class CustomerEntity {
 
     public void setCreatedAt(OffsetDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public OffsetDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 }

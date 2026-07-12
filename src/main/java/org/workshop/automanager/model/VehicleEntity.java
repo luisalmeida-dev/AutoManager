@@ -14,12 +14,12 @@ import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "customers")
-public class CustomerEntity {
+@Table(name = "vehicles")
+public class VehicleEntity {
 
     @Id
-    @SequenceGenerator(name = "customers_id_seq", sequenceName = "customers_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customers_id_seq")
+    @SequenceGenerator(name = "vehicles_id_seq", sequenceName = "vehicles_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "vehicles_id_seq")
     @Column(name = "id")
     private Integer id;
 
@@ -27,20 +27,21 @@ public class CustomerEntity {
     @JoinColumn(name = "workshop_id", nullable = false)
     private WorkshopEntity workshop;
 
-    @Column(name = "name", nullable = false, length = 100)
-    private String name;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private CustomerEntity customer;
 
-    @Column(name = "cpf", length = 11)
-    private String cpf;
+    @Column(name = "plate", nullable = false, length = 10)
+    private String plate;
 
-    @Column(name = "email", length = 100)
-    private String email;
+    @Column(name = "make_model", nullable = false, length = 100)
+    private String makeModel;
 
-    @Column(name = "phone", length = 20)
-    private String phone;
+    @Column(name = "manufacture_year")
+    private Integer manufactureYear;
 
-    @Column(name = "address", length = 200)
-    private String address;
+    @Column(name = "color", length = 30)
+    private String color;
 
     @Column(name = "active", nullable = false)
     private Boolean active = Boolean.TRUE;
@@ -67,44 +68,44 @@ public class CustomerEntity {
         this.workshop = workshop;
     }
 
-    public String getName() {
-        return name;
+    public CustomerEntity getCustomer() {
+        return customer;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCustomer(CustomerEntity customer) {
+        this.customer = customer;
     }
 
-    public String getCpf() {
-        return cpf;
+    public String getPlate() {
+        return plate;
     }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
+    public void setPlate(String plate) {
+        this.plate = plate;
     }
 
-    public String getEmail() {
-        return email;
+    public String getMakeModel() {
+        return makeModel;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setMakeModel(String makeModel) {
+        this.makeModel = makeModel;
     }
 
-    public String getPhone() {
-        return phone;
+    public Integer getManufactureYear() {
+        return manufactureYear;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setManufactureYear(Integer manufactureYear) {
+        this.manufactureYear = manufactureYear;
     }
 
-    public String getAddress() {
-        return address;
+    public String getColor() {
+        return color;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public Boolean getActive() {

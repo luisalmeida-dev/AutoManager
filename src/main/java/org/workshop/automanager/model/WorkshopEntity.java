@@ -2,45 +2,38 @@ package org.workshop.automanager.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "customers")
-public class CustomerEntity {
+@Table(name = "workshops")
+public class WorkshopEntity {
 
     @Id
-    @SequenceGenerator(name = "customers_id_seq", sequenceName = "customers_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customers_id_seq")
+    @SequenceGenerator(name = "workshops_id_seq", sequenceName = "workshops_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "workshops_id_seq")
     @Column(name = "id")
     private Integer id;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "workshop_id", nullable = false)
-    private WorkshopEntity workshop;
 
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "cpf", length = 11)
-    private String cpf;
+    @Column(name = "slug", nullable = false, length = 50, unique = true)
+    private String slug;
 
-    @Column(name = "email", length = 100)
-    private String email;
+    @Column(name = "tax_id", length = 14, unique = true)
+    private String taxId;
 
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @Column(name = "address", length = 200)
-    private String address;
+    @Column(name = "email", length = 100)
+    private String email;
 
     @Column(name = "active", nullable = false)
     private Boolean active = Boolean.TRUE;
@@ -59,14 +52,6 @@ public class CustomerEntity {
         this.id = id;
     }
 
-    public WorkshopEntity getWorkshop() {
-        return workshop;
-    }
-
-    public void setWorkshop(WorkshopEntity workshop) {
-        this.workshop = workshop;
-    }
-
     public String getName() {
         return name;
     }
@@ -75,20 +60,20 @@ public class CustomerEntity {
         this.name = name;
     }
 
-    public String getCpf() {
-        return cpf;
+    public String getSlug() {
+        return slug;
     }
 
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
+    public void setSlug(String slug) {
+        this.slug = slug;
     }
 
-    public String getEmail() {
-        return email;
+    public String getTaxId() {
+        return taxId;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setTaxId(String taxId) {
+        this.taxId = taxId;
     }
 
     public String getPhone() {
@@ -99,12 +84,12 @@ public class CustomerEntity {
         this.phone = phone;
     }
 
-    public String getAddress() {
-        return address;
+    public String getEmail() {
+        return email;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Boolean getActive() {
